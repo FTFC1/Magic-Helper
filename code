@@ -1,0 +1,200 @@
+import {
+  Button,
+  Label,
+  Textarea,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui";
+import {
+  ClipboardCopyIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  FilterIcon,
+  KeyboardIcon,
+  TargetIcon,
+  LayoutIcon,
+  ListIcon,
+  TypeIcon,
+} from "lucide-react";
+import React, { useState } from "react";
+import { render } from "react-dom";
+export default function PromptTransformationTool() {
+  const [input, setInput] = useState("");
+  const [output, setOutput] = useState("");
+  const [exampleLoaded, setExampleLoaded] = useState(false);
+  const [showRules, setShowRules] = useState(false);
+  const [sideBySideView, setSideBySideView] = useState(true);
+  const handleTransform = () => {
+    let transformed = input.trim();
+    transformed = transformed.replace(/\b(I want|a component for)\b/gi, "");
+    transformed = transformed.toUpperCase();
+    setOutput(transformed);
+  };
+  const handleClear = () => {
+    setInput("");
+    setOutput("");
+    setExampleLoaded(false);
+  };
+  const handleCopy = () => {
+    navigator.clipboard.writeText(output);
+  };
+  const handleExample = () => {
+    setInput(
+      "Create a responsive navigation bar with a logo, menu items, and a search input.",
+    );
+    setExampleLoaded(true);
+  };
+  const inputChars = input.length;
+  const outputChars = output.length;
+  const rules = [
+    {
+      icon: <FilterIcon className="h-4 w-4 mr-2" />,
+      text: "Remove filler words (e.g., 'I want', 'a component for')",
+    },
+    {
+      icon: <TargetIcon className="h-4 w-4 mr-2" />,
+      text: "Be specific and detailed in describing the desired output",
+    },
+    {
+      icon: <KeyboardIcon className="h-4 w-4 mr-2" />,
+      text: "Use keywords related to the component or feature",
+    },
+    {
+      icon: <LayoutIcon className="h-4 w-4 mr-2" />,
+      text: "Clarify UI elements and content explicitly",
+    },
+    {
+      icon: <ListIcon className="h-4 w-4 mr-2" />,
+      text: "Simplify complex instructions into clear, actionable steps",
+    },
+    {
+      icon: <TypeIcon className="h-4 w-4 mr-2" />,
+      text: "Mention specific component names or variants when applicable",
+    },
+    {
+      icon: <FilterIcon className="h-4 w-4 mr-2" />,
+      text: "Trim leading and trailing whitespace",
+    },
+    {
+      icon: <TypeIcon className="h-4 w-4 mr-2" />,
+      text: "Convert all text to uppercase",
+    },
+  ];
+  return (
+    <main className="max-w-full p-4">
+      <div className="flex justify-end mb-4">
+        <Button
+          variant="outline"
+          onClick={() => setSideBySideView(!sideBySideView)} >
+          {sideBySideView
+            ? "Switch to Top-Bottom View"
+            : "Switch to Side-by-Side View"}
+        </Button>
+      </div>
+
+      <div
+        className={`flex ${sideBySideView ? "flex-row space-x-4" : "flex-col space-y-4"}`} >
+        <div className="flex-1">
+          <div className="grid w-full gap-1.5">
+            <Label htmlFor="inputArea">
+              Enter your prompt here
+            </Label>
+            <Textarea
+              id="inputArea"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Type your prompt here."
+              className="h-48"
+              aria-label="Input area for prompt" />
+            <p className="mt-2 text-right">
+              {inputChars} characters
+            </p>
+          </div>
+        </div>
+
+        <div className="flex-1">
+          <div className="grid w-full gap-1.5">
+            <Label htmlFor="outputArea">
+              Transformed Prompt
+            </Label>
+            <Textarea
+              id="outputArea"
+              value={output}
+              readOnly
+              placeholder="Transformed prompt will appear here."
+              className="h-48 bg-gray-100"
+              aria-label="Output area for transformed prompt" />
+            <p className="mt-2 text-right">
+              {outputChars} characters
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex space-x-4 mt-4">
+        <Button onClick={handleTransform}>
+          Apply Guidelines
+        </Button>
+        <Button variant="secondary" onClick={handleClear}>
+          Clear
+        </Button>
+        <Button
+          variant="outline"
+          onClick={handleCopy}
+          className="flex items-center" >
+          <ClipboardCopyIcon className="mr-2 h-4 w-4" />
+          Copy
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={handleExample} >
+          {exampleLoaded ? "Reload Example" : "Load Example"}
+        </Button>
+      </div>
+
+      <div className="mt-4">
+        <Button
+          variant="link"
+          className="flex items-center"
+          onClick={() => setShowRules(!showRules)}
+          aria-expanded={showRules} >
+          {showRules ? (
+            <ChevronUpIcon />
+          ) : (
+            <ChevronDownIcon />
+          )}
+          <span className="ml-2">
+            Transformation Rules
+          </span>
+        </Button>
+        {showRules && (
+          <Card className="mt-2">
+            <CardHeader>
+              <CardTitle>
+                Prompt Transformation Rules
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                {rules.map((rule, index) => (
+                  <li
+                    key={index}
+                    className="flex items-center" >
+                    {rule.icon}
+                    <span>{rule.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </main>
+  );
+}
+render(
+  <PromptTransformationTool />,
+  document.getElementById("root"),
+);
